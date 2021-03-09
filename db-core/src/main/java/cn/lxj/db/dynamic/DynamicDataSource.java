@@ -1,5 +1,7 @@
 package cn.lxj.db.dynamic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 /**
@@ -7,11 +9,18 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
  */
 public class DynamicDataSource extends AbstractRoutingDataSource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSource.class);
+
     /**
-     * 动态获取数据源key
+     * 获取数据源key
      * @return
      */
     protected Object determineCurrentLookupKey() {
-        return null;
+        String dataSourceId = DynamicDataSourceContextHolder.getDataSourceId();
+        if (dataSourceId == null) {
+            dataSourceId = DynamicDataSourceRegister.DEFAULT_DATASOURCE_PREFIX;
+        }
+        LOGGER.info("Thread id: {}, DataSource id: [{}]", Thread.currentThread().getId(), dataSourceId);
+        return dataSourceId;
     }
 }
